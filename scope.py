@@ -5,7 +5,7 @@ import plotly.express as px
 def inventory_analysis_app():
 
     st.set_page_config(page_icon='💎')
-    
+
     hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -20,11 +20,11 @@ def inventory_analysis_app():
     body {
         margin: 0 !important;
     }
-    
+
     .main {
         padding-top: 70px !important; 
     }
-    
+
     .title-style {
         font-family: 'Lucida Handwriting', cursive;
         font-size: 60px;
@@ -44,13 +44,11 @@ def inventory_analysis_app():
     }
 </style>
 """
-
     st.markdown(title_style, unsafe_allow_html=True)
     st.markdown('<div class="title-style">SCOPE</div>', unsafe_allow_html=True)
     st.markdown('<div class="author-style">Author: Lothar Tjipueja</div>', unsafe_allow_html=True)
     st.title("Inventory Analysis Dashboard")
 
-    # Session state setup for button press memory
     if 'button_pressed' not in st.session_state:
         st.session_state.button_pressed = False
 
@@ -62,7 +60,13 @@ def inventory_analysis_app():
 
     if uploaded_file:
         inventory_data = pd.read_excel(uploaded_file)
-        
+
+        # Calculate Total Sales for Current Month for all items
+        total_sales_current_month = (inventory_data['Current Month'] * inventory_data['Unit Cost']).sum()
+
+        # Formatting the total sales with commas and displaying it in bold above the chart
+        st.markdown(f"<span >Total Sales for Current Month:</span><span style='color:green;'> ${total_sales_current_month:,.2f}</span>", unsafe_allow_html=True)
+
         st.write("Select a product by:")
         selected_row_ref = st.selectbox('Row Ref. No.', [None] + inventory_data['Row Ref. No.'].tolist())
         selected_description = st.selectbox('Description', [None] + inventory_data['Description'].tolist())
