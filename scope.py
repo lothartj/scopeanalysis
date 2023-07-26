@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.express as px
 
 def inventory_analysis_app():
-
     st.set_page_config(page_icon='💎')
 
     hide_st_style = """
@@ -61,11 +60,21 @@ def inventory_analysis_app():
     if uploaded_file:
         inventory_data = pd.read_excel(uploaded_file)
 
-        # Calculate Total Sales for Current Month for all items
-        total_sales_current_month = (inventory_data['Current Month'] * inventory_data['Unit Cost']).sum()
+        # Determine periods from the Excel headers
+        headers = list(inventory_data.columns)
+        expected_periods = ['Current Period', 'Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7', 'Period 8', 'Period 9', 'Period 10', 'Period 11']
+        
+        if set(expected_periods).issubset(set(headers)):
+            periods = expected_periods
+        else:
+            periods = ['Current Month', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6', 'Month 7', 'Month 8', 'Month 9', 'Month 10', 'Month 11', 'Month 12']
 
+        # Calculate Total Sales for the first period for all items
+        first_period = periods[0]
+        total_sales_current_month = (inventory_data[first_period] * inventory_data['Unit Cost']).sum()
+        
         # Formatting the total sales with commas and displaying it in bold above the chart
-        st.markdown(f"<span >Total Sales for Current Month:</span><span style='color:green;'> ${total_sales_current_month:,.2f}</span>", unsafe_allow_html=True)
+        st.markdown(f"Total Sales for {first_period}: <span style='color:green;'>${total_sales_current_month:,.2f}</span>", unsafe_allow_html=True)
 
         st.write("Select a product by:")
         selected_row_ref = st.selectbox('Row Ref. No.', [None] + inventory_data['Row Ref. No.'].tolist())
@@ -79,13 +88,12 @@ def inventory_analysis_app():
             st.write("Please select a product.")
             return
 
-        periods = ['Current Month', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6', 'Month 7', 'Month 8', 'Month 9', 'Month 10', 'Month 11', 'Month 12']
         df_chart = pd.DataFrame({
             'Period': periods,
             'Sales': selected_data[periods].values
         })
-        avg_sales = df_chart['Sales'].mean()
 
+        avg_sales = df_chart['Sales'].mean()
         fig = px.line(df_chart, x='Period', y='Sales', title=f"Sales for {selected_data['Description']}")
         fig.add_scatter(x=df_chart['Period'], y=df_chart['Sales'], mode='markers+text', text=df_chart['Sales'])
         fig.update_traces(texttemplate='%{text}', textposition='top center')
