@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 def inventory_analysis_app():
-    st.set_page_config(page_icon='💎')
+    st.set_page_config(page_icon='📉')
 
     hide_st_style = """
             <style>
@@ -45,14 +45,14 @@ def inventory_analysis_app():
 """
     st.markdown(title_style, unsafe_allow_html=True)
     st.markdown('<div class="title-style">SCOPE</div>', unsafe_allow_html=True)
-    st.markdown('<div class="author-style">Author: Lothar Tjipueja</div>', unsafe_allow_html=True)
+    st.markdown('<div class="author-style">Lothar Tjipueja</div>', unsafe_allow_html=True)
     st.title("Inventory Analysis Dashboard")
 
     if 'button_pressed' not in st.session_state:
         st.session_state.button_pressed = False
 
-    if st.session_state.button_pressed or st.button("📉 Load Inventory Analysis Matrix"):
-        uploaded_file = "Inventory Analysis Matrix (1).xlsx"
+    if st.session_state.button_pressed or st.button("📉 Example Data"):
+        uploaded_file = "Example Data.xlsx"
         st.session_state.button_pressed = True
     else:
         uploaded_file = st.file_uploader("Or, upload your Excel file", type=["xlsx"])
