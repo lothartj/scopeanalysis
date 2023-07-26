@@ -21,7 +21,8 @@ def inventory_analysis_app():
     }
 
     .main {
-        padding-top: 70px !important; 
+        padding-top: 0px !important; 
+        border: 1px solid black;
     }
 
     .title-style {
@@ -74,7 +75,7 @@ def inventory_analysis_app():
         total_sales_current_month = (inventory_data[first_period] * inventory_data['Unit Cost']).sum()
         
         # Formatting the total sales with commas and displaying it in bold above the chart
-        st.markdown(f"Total Sales for {first_period}: <span style='color:green;'>${total_sales_current_month:,.2f}</span>", unsafe_allow_html=True)
+        st.markdown(f"Total Sales for {first_period}: <span style='color:green;'>N${total_sales_current_month:,.2f}</span>", unsafe_allow_html=True)
 
         st.write("Select a product by:")
         selected_row_ref = st.selectbox('Row Ref. No.', [None] + inventory_data['Row Ref. No.'].tolist())
