@@ -64,18 +64,16 @@ def inventory_analysis_app():
         # Determine periods from the Excel headers
         headers = list(inventory_data.columns)
         expected_periods = ['Current Period', 'Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7', 'Period 8', 'Period 9', 'Period 10', 'Period 11']
-        
+
         if set(expected_periods).issubset(set(headers)):
             periods = expected_periods
         else:
             periods = ['Current Month', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6', 'Month 7', 'Month 8', 'Month 9', 'Month 10', 'Month 11', 'Month 12']
 
-        # Calculate Total Sales for the first period for all items
         first_period = periods[0]
-        total_sales_current_month = (inventory_data[first_period] * inventory_data['Unit Cost']).sum()
-        
-        # Formatting the total sales with commas and displaying it in bold above the chart
-        st.markdown(f"Total Sales for {first_period}: <span style='color:green;'>N${total_sales_current_month:,.2f}</span>", unsafe_allow_html=True)
+        total_sales_current_period = (inventory_data[first_period] * inventory_data['Unit Cost']).sum()
+
+        st.markdown(f"Total Sales for {first_period}: <span style='color:green;'>N${total_sales_current_period:,.2f}</span>", unsafe_allow_html=True)
 
         st.write("Select a product by:")
         selected_row_ref = st.selectbox('Row Ref. No.', [None] + inventory_data['Row Ref. No.'].tolist())
@@ -95,6 +93,7 @@ def inventory_analysis_app():
         })
 
         avg_sales = df_chart['Sales'].mean()
+
         fig = px.line(df_chart, x='Period', y='Sales', title=f"Sales for {selected_data['Description']}")
         fig.add_scatter(x=df_chart['Period'], y=df_chart['Sales'], mode='markers+text', text=df_chart['Sales'])
         fig.update_traces(texttemplate='%{text}', textposition='top center')
@@ -105,6 +104,28 @@ def inventory_analysis_app():
         st.write("**Unit Cost:**", selected_data['Unit Cost'])
         st.write("**Stock Value:**", selected_data['Stock Value'])
         st.write("**Average Monthly Sales:**", avg_sales)
+
+
+        # And round the 'Total Sales' values directly in the DataFrame
+        # Create a new DataFrame for the second chart
+        df_chart2 = pd.DataFrame({
+            'Month': periods,
+            'Total Sales': [(inventory_data[period] * inventory_data['Unit Cost']).sum() for period in periods]
+        })
+
+        # Create formatted text for the scatter points (rounded to two decimal places)
+        rounded_sales_text = [f"{value:,.2f}" for value in df_chart2['Total Sales']]
+
+        # Plot the second chart showing Total Sales for each Month
+        fig2 = px.line(df_chart2, x='Month', y='Total Sales', title="Total Sales for Each Month")
+        fig2.add_scatter(x=df_chart2['Month'], y=df_chart2['Total Sales'], mode='markers+text', text=rounded_sales_text, name='trace1')
+        fig2.update_traces(textposition='top center')
+        st.plotly_chart(fig2, config={'displayModeBar': True, 'displaylogo': False})
+        st.markdown(f"Total Sales for {first_period}: <span style='color:green;'>N${total_sales_current_period:,.2f}</span>", unsafe_allow_html=True)
+
+
+
+
 
     else:
         st.write("Please load an Excel file.")
